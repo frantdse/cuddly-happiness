@@ -14,6 +14,7 @@ const SINOPSIS = {
     qr: "Actualidad, política y debate en la noche del canal con la conducción de Pablo Caruso.",
     rebord: "Espacio de entrevistas e impresiones conducido por Tomás Rebord.",
     yAhoraQue: "Cierre de la jornada con debate y análisis de la agenda informativa.",
+    perfilBrasil: "La actualidad política, económica y social del gigante sudamericano.",
     finDia: "Programación en pausa o transición."
 };
 
@@ -31,48 +32,67 @@ const DOCUMENTALES_DW = { nombre: "Documentales DW", sinopsis: SINOPSIS.document
 const QR = { nombre: "QR!", sinopsis: SINOPSIS.qr };
 const REBORD = { nombre: "Rebord", sinopsis: SINOPSIS.rebord };
 const Y_AHORA_QUE = { nombre: "¿Y ahora qué?", sinopsis: SINOPSIS.yAhoraQue };
+const PERFIL_BRASIL = { nombre: "Perfil Brasil", sinopsis: SINOPSIS.perfilBrasil };
 const CODA_FINAL = { inicio: 2359, fin: 0, nombre: "Cierre de Emisión", sinopsis: SINOPSIS.finDia };
 
-// Bloque común de madrugada y mañana (Lunes a Viernes)
-const MADRUGADA_Y_MANANA_BASE = [
+// Bloque común matutino/tarde (Lunes a Jueves)
+const BASE_LUNES_A_JUEVES = [
     { inicio: 0, fin: 500, ...TRASNOCHE },
     { inicio: 500, fin: 800, ...MANANA_INFORMATIVA },
     { inicio: 800, fin: 1000, ...LONGOBARDI },
     { inicio: 1000, fin: 1300, ...MODO_FONTEVECCHIA },
     { inicio: 1300, fin: 1430, ...RONDA_INVESTIGACION },
     { inicio: 1430, fin: 1630, ...RONDA_CORRESPONSALES },
-    { inicio: 1630, fin: 1800, ...RONDA_ECONOMISTAS }
+    { inicio: 1630, fin: 1800, ...RONDA_ECONOMISTAS },
+    { inicio: 1800, fin: 1930, ...RONDA_ESCRITORES },
+    { inicio: 1930, fin: 2100, ...RONDA_EDITORES },
+    { inicio: 2100, fin: 2300, ...QR }
 ];
 
-// Grillas Diarias
+// 1. LUNES, MARTES Y MIÉRCOLES (Cierre con Rebord)
 const PROGRAMACION_LUNES_A_MIERCOLES = [
-    ...MADRUGADA_Y_MANANA_BASE,
-    { inicio: 1800, fin: 1930, ...RONDA_ESCRITORES },
-    { inicio: 1930, fin: 2100, ...RONDA_EDITORES },
-    { inicio: 2100, fin: 2300, ...QR },
-    { inicio: 2300, fin: 2359, ...Y_AHORA_QUE },
-    CODA_FINAL
-];
-
-const PROGRAMACION_JUEVES = [
-    ...MADRUGADA_Y_MANANA_BASE,
-    { inicio: 1800, fin: 1930, ...RONDA_ESCRITORES },
-    { inicio: 1930, fin: 2100, ...RONDA_EDITORES },
-    { inicio: 2100, fin: 2300, ...QR },
+    ...BASE_LUNES_A_JUEVES,
     { inicio: 2300, fin: 2359, ...REBORD },
     CODA_FINAL
 ];
 
-const PROGRAMACION_VIERNES = [
-    ...MADRUGADA_Y_MANANA_BASE,
-    { inicio: 1800, fin: 1830, ...DOCUMENTALES_DW },
-    { inicio: 1830, fin: 2100, ...RONDA_EDITORES },
-    { inicio: 2100, fin: 2300, ...QR },
+// 2. JUEVES (Cierre con ¿Y ahora qué?)
+const PROGRAMACION_JUEVES = [
+    ...BASE_LUNES_A_JUEVES,
     { inicio: 2300, fin: 2359, ...Y_AHORA_QUE },
     CODA_FINAL
 ];
 
-const PROGRAMACION_FIN_DE_SEMANA = [
+// 3. VIERNES (Perfil Brasil, DW, Longobardi y Modo Fontevecchia)
+const PROGRAMACION_VIERNES = [
+    { inicio: 0, fin: 500, ...TRASNOCHE },
+    { inicio: 500, fin: 800, ...MANANA_INFORMATIVA },
+    { inicio: 800, fin: 1000, ...LONGOBARDI },
+    { inicio: 1000, fin: 1300, ...MODO_FONTEVECCHIA },
+    { inicio: 1300, fin: 1330, ...PERFIL_BRASIL },
+    { inicio: 1330, fin: 1430, ...RONDA_INVESTIGACION },
+    { inicio: 1430, fin: 1630, ...RONDA_CORRESPONSALES },
+    { inicio: 1630, fin: 1800, ...RONDA_ECONOMISTAS },
+    { inicio: 1800, fin: 1830, ...DOCUMENTALES_DW },
+    { inicio: 1830, fin: 2100, ...RONDA_EDITORES },
+    { inicio: 2100, fin: 2130, ...QR },
+    { inicio: 2130, fin: 2330, ...LONGOBARDI },
+    { inicio: 2330, fin: 2359, ...MODO_FONTEVECCHIA },
+    CODA_FINAL
+];
+
+// 4. SÁBADO (Incluye la continuidad de Modo Fontevecchia hasta las 02:30)
+const PROGRAMACION_SABADO = [
+    { inicio: 0, fin: 230, ...MODO_FONTEVECCHIA },
+    { inicio: 230, fin: 800, ...TRASNOCHE },
+    { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA },
+    { inicio: 1300, fin: 1800, nombre: "Lo Mejor de la Semana", sinopsis: SINOPSIS.trasnoche },
+    { inicio: 1800, fin: 2359, nombre: "Especiales +Perfil", sinopsis: SINOPSIS.trasnoche },
+    CODA_FINAL
+];
+
+// 5. DOMINGO
+const PROGRAMACION_DOMINGO = [
     { inicio: 0, fin: 800, ...TRASNOCHE },
     { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA },
     { inicio: 1300, fin: 1800, nombre: "Lo Mejor de la Semana", sinopsis: SINOPSIS.trasnoche },
@@ -81,13 +101,13 @@ const PROGRAMACION_FIN_DE_SEMANA = [
 ];
 
 const PROGRAMACION_SEMANAL = {
-    0: PROGRAMACION_FIN_DE_SEMANA,        /* Domingo */
+    0: PROGRAMACION_DOMINGO,        /* Domingo */
     1: PROGRAMACION_LUNES_A_MIERCOLES,    /* Lunes */
     2: PROGRAMACION_LUNES_A_MIERCOLES,    /* Martes */
     3: PROGRAMACION_LUNES_A_MIERCOLES,    /* Miércoles */
     4: PROGRAMACION_JUEVES,              /* Jueves */
     5: PROGRAMACION_VIERNES,              /* Viernes */
-    6: PROGRAMACION_FIN_DE_SEMANA         /* Sábado */
+    6: PROGRAMACION_SABADO               /* Sábado */
 };
 
 const NOMBRES_DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
