@@ -38,7 +38,7 @@ const CODA_FINAL = { inicio: 2359, fin: 0, nombre: "Cierre de Emisión", sinopsi
 // Bloque común matutino/tarde (Lunes a Jueves)
 const BASE_LUNES_A_JUEVES = [
     { inicio: 0, fin: 500, ...TRASNOCHE },
-    { inicio: 500, fin: 800, ...MANANA_INFORMATIVA },
+    { inicio: 600, fin: 800, ...MANANA_INFORMATIVA },
     { inicio: 800, fin: 1000, ...LONGOBARDI },
     { inicio: 1000, fin: 1300, ...MODO_FONTEVECCHIA },
     { inicio: 1300, fin: 1430, ...RONDA_INVESTIGACION },
@@ -51,7 +51,7 @@ const BASE_LUNES_A_JUEVES = [
 
 // 1. LUNES, MARTES Y MIÉRCOLES (Cierre con Rebord)
 const PROGRAMACION_LUNES_A_MIERCOLES = [
-    ...BASE_LUNES_A_JUEVES,
+    ...BASE_LUNES_A_JUEVES,   
     { inicio: 2300, fin: 2359, ...REBORD },
     CODA_FINAL
 ];
@@ -59,6 +59,7 @@ const PROGRAMACION_LUNES_A_MIERCOLES = [
 // 2. JUEVES (Cierre con ¿Y ahora qué?)
 const PROGRAMACION_JUEVES = [
     ...BASE_LUNES_A_JUEVES,
+    { inicio: 0500, fin: 0530, ...DOCUMENTALES_DW },    
     { inicio: 2300, fin: 2359, ...Y_AHORA_QUE },
     CODA_FINAL
 ];
@@ -66,7 +67,8 @@ const PROGRAMACION_JUEVES = [
 // 3. VIERNES (Perfil Brasil, DW, Longobardi y Modo Fontevecchia)
 const PROGRAMACION_VIERNES = [
     { inicio: 0, fin: 500, ...TRASNOCHE },
-    { inicio: 500, fin: 800, ...MANANA_INFORMATIVA },
+    { inicio: 500, fin: 530, ...DOCUMENTALES_DW },    
+    { inicio: 600, fin: 800, ...MANANA_INFORMATIVA },
     { inicio: 800, fin: 1000, ...LONGOBARDI },
     { inicio: 1000, fin: 1300, ...MODO_FONTEVECCHIA },
     { inicio: 1300, fin: 1330, ...PERFIL_BRASIL },
@@ -85,8 +87,9 @@ const PROGRAMACION_VIERNES = [
 const PROGRAMACION_SABADO = [
     { inicio: 0, fin: 230, ...MODO_FONTEVECCHIA },
     { inicio: 230, fin: 800, ...TRASNOCHE },
-    { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA },
-    { inicio: 1300, fin: 1800, nombre: "Lo Mejor de la Semana", sinopsis: SINOPSIS.trasnoche },
+    { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA }
+    { inicio: 1300, fin: 1330, ...PERFIL_BRASIL },    
+    { inicio: 1330, fin: 1800, nombre: "Lo Mejor de la Semana", sinopsis: SINOPSIS.trasnoche },
     { inicio: 1800, fin: 2359, nombre: "Especiales +Perfil", sinopsis: SINOPSIS.trasnoche },
     CODA_FINAL
 ];
