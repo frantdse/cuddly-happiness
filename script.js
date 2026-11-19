@@ -59,7 +59,7 @@ const PROGRAMACION_LUNES_A_MIERCOLES = [
 // 2. JUEVES (Cierre con ¿Y ahora qué?)
 const PROGRAMACION_JUEVES = [
     ...BASE_LUNES_A_JUEVES,
-    { inicio: 0500, fin: 0530, ...DOCUMENTALES_DW },    
+    { inicio: 500, fin: 530, ...DOCUMENTALES_DW },    
     { inicio: 2300, fin: 2359, ...Y_AHORA_QUE },
     CODA_FINAL
 ];
@@ -87,7 +87,7 @@ const PROGRAMACION_VIERNES = [
 const PROGRAMACION_SABADO = [
     { inicio: 0, fin: 230, ...MODO_FONTEVECCHIA },
     { inicio: 230, fin: 800, ...TRASNOCHE },
-    { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA },
+    { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA }, // <-- Coma corregida acá
     { inicio: 1300, fin: 1330, ...PERFIL_BRASIL },    
     { inicio: 1330, fin: 1800, nombre: "Lo Mejor de la Semana", sinopsis: SINOPSIS.trasnoche },
     { inicio: 1800, fin: 2359, nombre: "Especiales +Perfil", sinopsis: SINOPSIS.trasnoche },
@@ -179,6 +179,9 @@ function updateProgramacion() {
         programasFuturos = programacionHoy.filter(p => p.inicio > currentTimeHHMM);
     }
 
+    // Ordenar cronológicamente los futuros
+    programasFuturos.sort((a, b) => a.inicio - b.inicio);
+
     const duration = formatDuration(programaActual.inicio, programaActual.fin);
 
     // 3. Mostrar AHORA AL AIRE
@@ -250,7 +253,9 @@ function generateWeeklyTabs() {
             content.classList.add('active');
         }
         
-        const programacionDia = PROGRAMACION_SEMANAL[dayIndex] || [];
+        // Copiar y ordenar cronológicamente los programas del día
+        const programacionDia = [...(PROGRAMACION_SEMANAL[dayIndex] || [])];
+        programacionDia.sort((a, b) => a.inicio - b.inicio);
         
         if (programacionDia.length > 0) {
             programacionDia.forEach(p => {
