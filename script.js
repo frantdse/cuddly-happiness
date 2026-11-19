@@ -87,7 +87,7 @@ const PROGRAMACION_VIERNES = [
 const PROGRAMACION_SABADO = [
     { inicio: 0, fin: 230, ...MODO_FONTEVECCHIA },
     { inicio: 230, fin: 800, ...TRASNOCHE },
-    { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA }
+    { inicio: 800, fin: 1300, ...MODO_FONTEVECCHIA },
     { inicio: 1300, fin: 1330, ...PERFIL_BRASIL },    
     { inicio: 1330, fin: 1800, nombre: "Lo Mejor de la Semana", sinopsis: SINOPSIS.trasnoche },
     { inicio: 1800, fin: 2359, nombre: "Especiales +Perfil", sinopsis: SINOPSIS.trasnoche },
