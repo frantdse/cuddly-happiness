@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chacra TV | Grilla de Programación en Vivo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    colors: {
+                        chacra: {
+                            dark: '#1B4332',
+                            primary: '#2D6A4F',
+                            light: '#40916C',
+                            mint: '#D8F3DC',
+                            gold: '#D4A373',
+                            wheat: '#E9C46A',
+                            bg: '#F8F9FA'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Animación sutil para el punto de EN VIVO */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            80%, 100% { transform: scale(2.2); opacity: 0; }
+        }
+        .live-dot::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background-color: #ef4444;
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        /* Barra de desplazamiento personalizada */
+        ::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-chacra-bg text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Barra Superior Institucional -->
+    <header class="bg-chacra-dark text-white shadow-md sticky top-0 z-30 border-b border-chacra-primary/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+            <!-- Logo Chacra TV -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-chacra-light to-chacra-primary flex items-center justify-center shadow-inner border border-chacra-wheat/40">
+                    <i data-lucide="sprout" class="w-6 h-6 text-chacra-wheat"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-white">CHACRA<span class="text-chacra-wheat">TV</span></span>
+                        <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-widest bg-chacra-primary/80 text-chacra-mint px-2 py-0.5 rounded-full border border-chacra-light/30">Señal Agroindustrial</span>
+                    </div>
+                    <p class="text-xs text-chacra-mint/80 hidden sm:block">El canal del campo y la agroindustria</p>
+                </div>
+            </div>
+
+            <!-- Reloj en Vivo y Estado de Simulación -->
+            <div class="flex items-center gap-3">
+                <div id="sim-badge" class="hidden items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 text-amber-200 px-3 py-1 rounded-full text-xs font-semibold">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-300"></i>
+                    <span>Modo Simulación</span>
+                </div>
+            <!-- Reloj en Vivo -->
+            <div class="text-right bg-black/25 px-3.5 py-1.5 rounded-xl border border-white/10">
+                <div id="live-clock" class="font-display font-bold text-base sm:text-xl text-chacra-wheat tabular-nums leading-none">--:--:--</div>
+                <div id="live-date-label" class="text-[11px] sm:text-xs text-slate-300 capitalize mt-0.5">Cargando...</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+
+        <!-- SECCIÓN 1: TARJETA PRINCIPAL "AHORA EN EMISIÓN" Y "A CONTINUACIÓN" -->
+        <section aria-label="Programación en curso" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+            
+            <!-- Tarjeta Principal: En Emisión (8 columnas en desktop) -->
+            <div class="lg:col-span-8 bg-gradient-to-br from-chacra-dark via-chacra-primary to-chacra-dark rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col justify-between border border-chacra-light/30">
+                <!-- Decoración geométrica de fondo -->
+                <div class="absolute -right-12 -top-12 w-56 h-56 rounded-full bg-chacra-wheat/10 blur-2xl pointer-events-none"></div>
+                <div class="absolute right-6 bottom-6 opacity-10 pointer-events-none">
+                    <i data-lucide="tv" class="w-32 h-32 text-white"></i>
+                </div>
+
+                <div>
+                    <!-- Badges Superiores -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-2.5">
+                            <span id="status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-600 text-white shadow-sm">
+                                <span class="relative flex h-2.5 w-2.5 live-dot">
+                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                                </span>
+                                <span id="status-badge-text">EN VIVO</span>
+                            </span>
+                            <span id="current-slot-time" class="text-xs sm:text-sm font-semibold bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full text-chacra-wheat border border-white/10">
+                                --:-- a --:-- hs
+                            </span>
+                        </div>
+                        <span id="micros-badge" class="hidden items-center gap-1.5 text-xs font-semibold bg-chacra-wheat text-chacra-dark px-3 py-1 rounded-full shadow-sm">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            + Micros CRA
+                        </span>
+                    </div>
+
+                    <!-- Título del Programa Actual -->
+                    <div class="space-y-1.5 my-2">
+                        <p id="current-context-label" class="text-xs sm:text-sm font-medium text-chacra-mint/90 uppercase tracking-wider">Ahora en pantalla</p>
+                        <h1 id="current-program-title" class="font-display font-extrabold text-2xl sm:text-4xl text-white leading-tight tracking-tight">
+                            Cargando programación...
+                        </h1>
+                        <p id="current-program-subtitle" class="text-sm sm:text-base text-slate-200 max-w-2xl">
+                            Consultando la grilla oficial de Chacra TV.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Barra de Progreso del Bloque -->
+                <div id="progress-container" class="mt-6 pt-4 border-t border-white/15">
+                    <div class="flex justify-between items-center text-xs font-medium text-chacra-mint mb-2">
+                        <span id="progress-elapsed">Transcurrido: 0 min</span>
+                        <span id="progress-remaining" class="text-chacra-wheat font-semibold">Restan: -- min</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-black/35 rounded-full overflow-hidden p-0.5 border border-white/10">
+                        <div id="progress-bar" class="h-full bg-gradient-to-r from-chacra-gold to-chacra-wheat rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Secundaria: A Continuación (4 columnas en desktop) -->
+            <div class="lg:col-span-4 bg-white rounded-2xl p-6 shadow-md border border-slate-200/80 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-chacra-primary bg-chacra-mint/60 px-3 py-1 rounded-full">
+                            <i data-lucide="fast-forward" class="w-3.5 h-3.5"></i>
+                            A continuación
+                        </span>
+                        <span id="next-slot-time" class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                            --:-- hs
+                        </span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <p id="next-day-label" class="text-xs font-semibold text-chacra-gold uppercase tracking-wide">Próximo bloque</p>
+                        <h2 id="next-program-title" class="font-display font-bold text-xl text-slate-900 leading-snug">
+                            --
+                        </h2>
+                        <p id="next-program-detail" class="text-sm text-slate-600">
+                            --
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="calendar-clock" class="w-4 h-4 text-chacra-light"></i>
+                        <span id="countdown-next">Inicia en -- min</span>
+                    </span>
+                    <a href="#grilla-semanal" class="font-semibold text-chacra-primary hover:text-chacra-dark flex items-center gap-1 transition-colors">
+                        Ver grilla <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: GRILLA SEMANAL COMPLETA -->
+        <section id="grilla-semanal" aria-label="Grilla de programación semanal" class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-chacra-primary">Programación Diaria (07:00 a 20:00 hs)</span>
+                    <h2 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900">Grilla Semanal · Lunes a Viernes</h2>
+                </div>
+
+                <!-- Filtros rápidos por día (especialmente útiles en móvil/tablet) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" role="tablist" aria-label="Filtrar grilla por día">
+                    <button type="button" data-filter-day="all" class="day-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-chacra-dark text-white shadow-sm transition-all cursor-pointer whitespace-nowrap">
+                        Todos los días
+                    </button>
+                    <button type="button" data-filter-day="1" class="day-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer">
+                        Lunes
+                    </button>
+                    <button type="button" data-filter-day="2" class="day-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer">
+                        Martes
+                    </button>
+                    <button type="button" data-filter-day="3" class="day-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer">
+                        Miércoles
+                    </button>
+                    <button type="button" data-filter-day="4" class="day-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer">
+                        Jueves
+                    </button>
+                    <button type="button" data-filter-day="5" class="day-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer">
+                        Viernes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Leyenda de referencias -->
+            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600 bg-white px-4 py-2.5 rounded-xl border border-slate-200/80">
+                <span class="font-semibold text-slate-700">Referencias:</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Emisión EN VIVO
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-chacra-gold"></span> Incluye Micros CRA
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded bg-chacra-mint border border-chacra-light"></span> Programa al aire ahora
+                </span>
+            </div>
+
+            <!-- Contenedor de la Tabla Responsiva (Vista Desktop y Tablet) -->
+            <div id="desktop-grid-wrapper" class="bg-white rounded-2xl shadow-md border border-slate-200/90 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[780px]">
+                        <thead>
+                            <tr class="bg-chacra-dark text-white text-xs uppercase tracking-wider">
+                                <th class="py-4 px-4 font-display font-bold w-28 border-r border-white/10 sticky left-0 bg-chacra-dark z-10">
+                                    Horario
+                                </th>
+                                <th data-col-day="1" class="py-4 px-4 font-display font-bold w-1/5 border-r border-white/10 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <span>Lunes</span>
+                                        <span class="day-today-tag hidden text-[10px] bg-chacra-wheat text-chacra-dark px-2 py-0.5 rounded-full font-extrabold">HOY</span>
+                                    </div>
+                                </th>
+                                <th data-col-day="2" class="py-4 px-4 font-display font-bold w-1/5 border-r border-white/10 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <span>Martes</span>
+                                        <span class="day-today-tag hidden text-[10px] bg-chacra-wheat text-chacra-dark px-2 py-0.5 rounded-full font-extrabold">HOY</span>
+                                    </div>
+                                </th>
+                                <th data-col-day="3" class="py-4 px-4 font-display font-bold w-1/5 border-r border-white/10 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <span>Miércoles</span>
+                                        <span class="day-today-tag hidden text-[10px] bg-chacra-wheat text-chacra-dark px-2 py-0.5 rounded-full font-extrabold">HOY</span>
+                                    </div>
+                                </th>
+                                <th data-col-day="4" class="py-4 px-4 font-display font-bold w-1/5 border-r border-white/10 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <span>Jueves</span>
+                                        <span class="day-today-tag hidden text-[10px] bg-chacra-wheat text-chacra-dark px-2 py-0.5 rounded-full font-extrabold">HOY</span>
+                                    </div>
+                                </th>
+                                <th data-col-day="5" class="py-4 px-4 font-display font-bold w-1/5 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <span>Viernes</span>
+                                        <span class="day-today-tag hidden text-[10px] bg-chacra-wheat text-chacra-dark px-2 py-0.5 rounded-full font-extrabold">HOY</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-table-body" class="divide-y divide-slate-200/80 text-sm">
+                            <!-- Filas generadas dinámicamente por JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vista de Tarjetas por Día (Se muestra cuando se filtra un día específico) -->
+            <div id="single-day-cards-wrapper" class="hidden space-y-3">
+                <!-- Tarjetas generadas dinámicamente cuando el usuario selecciona un día en el filtro -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Institucional -->
+    <footer class="bg-chacra-dark text-slate-300 border-t border-chacra-primary/40 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="font-display font-bold text-white text-sm">CHACRA<span class="text-chacra-wheat">TV</span></span>
+                <span class="text-slate-400">|</span>
+                <span>Grilla de Programación Oficial · Horario de Argentina (GMT-3)</span>
+            </div>
+            <p class="text-slate-400">Actualización automática en tiempo real.</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPT DE PROGRAMACIÓN DINÁMICA -->
+    <script>
+        /**
+         * BASE DE DATOS DE LA GRILLA DE PROGRAMACIÓN DE CHACRA TV
+         * Días: 1 = Lunes, 2 = Martes, 3 = Miércoles, 4 = Jueves, 5 = Viernes
+         * Horarios expresados en formato "HH:MM" y minutos desde medianoche para cálculos exactos.
+         */
+        const SCHEDULE_SLOTS = [
+            {
+                id: 'slot-0700',
+                start: '07:00',
+                end: '09:00',
+                startMin: 7 * 60,
+                endMin: 9 * 60,
+                days: {
+                    1: { title: 'Mañana Express', subtitle: 'Toda la actualidad agropecuaria, clima y mercados para arrancar el día.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Mañana Express', subtitle: 'Toda la actualidad agropecuaria, clima y mercados para arrancar el día.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Mañana Express', subtitle: 'Toda la actualidad agropecuaria, clima y mercados para arrancar el día.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Mañana Express', subtitle: 'Toda la actualidad agropecuaria, clima y mercados para arrancar el día.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Mañana Express', subtitle: 'Toda la actualidad agropecuaria, clima y mercados para arrancar el día.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-0900',
+                start: '09:00',
+                end: '09:30',
+                startMin: 9 * 60,
+                endMin: 9 * 60 + 30,
+                days: {
+                    1: { title: 'Nombres que Dejan Marca', subtitle: 'Historias y protagonistas fundamentales del sector agroindustrial.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Nombres que Dejan Marca', subtitle: 'Historias y protagonistas fundamentales del sector agroindustrial.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Nombres que Dejan Marca', subtitle: 'Historias y protagonistas fundamentales del sector agroindustrial.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Nombres que Dejan Marca', subtitle: 'Historias y protagonistas fundamentales del sector agroindustrial.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Nombres que Dejan Marca', subtitle: 'Historias y protagonistas fundamentales del sector agroindustrial.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-0930',
+                start: '09:30',
+                end: '10:00',
+                startMin: 9 * 60 + 30,
+                endMin: 10 * 60,
+                days: {
+                    1: { title: 'Chacra TV Noticias', edition: '1° Edición', subtitle: 'El resumen informativo matutino con las noticias clave del campo.', isLive: true, hasMicrosCRA: true },
+                    2: { title: 'Chacra TV Noticias', edition: '1° Edición', subtitle: 'El resumen informativo matutino con las noticias clave del campo.', isLive: true, hasMicrosCRA: true },
+                    3: { title: 'Chacra TV Noticias', edition: '1° Edición', subtitle: 'El resumen informativo matutino con las noticias clave del campo.', isLive: true, hasMicrosCRA: true },
+                    4: { title: 'Chacra TV Noticias', edition: '1° Edición', subtitle: 'El resumen informativo matutino con las noticias clave del campo.', isLive: true, hasMicrosCRA: true },
+                    5: { title: 'Chacra TV Noticias', edition: '1° Edición', subtitle: 'El resumen informativo matutino con las noticias clave del campo.', isLive: true, hasMicrosCRA: true }
+                }
+            },
+            {
+                id: 'slot-1000',
+                start: '10:00',
+                end: '10:30',
+                startMin: 10 * 60,
+                endMin: 10 * 60 + 30,
+                days: {
+                    1: { title: 'Agroindustriales en Chacra TV', subtitle: 'Análisis de las cadenas de valor y el desarrollo agroindustrial argentino.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'En el radar', edition: 'con Mauricio Saldívar', subtitle: 'Pronóstico meteorológico especializado y tendencias climáticas para el agro.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'En el radar', edition: 'con Mauricio Saldívar', subtitle: 'Pronóstico meteorológico especializado y tendencias climáticas para el agro.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'En el radar', edition: 'con Mauricio Saldívar', subtitle: 'Pronóstico meteorológico especializado y tendencias climáticas para el agro.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'En el radar', edition: 'con Mauricio Saldívar', subtitle: 'Pronóstico meteorológico especializado y tendencias climáticas para el agro.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1030',
+                start: '10:30',
+                end: '11:00',
+                startMin: 10 * 60 + 30,
+                endMin: 11 * 60,
+                days: {
+                    1: { title: 'Diálogos con Chacra', subtitle: 'Entrevistas en profundidad con referentes, productores y autoridades del sector.', isLive: true, hasMicrosCRA: true },
+                    2: { title: 'Agroindustriales en Chacra TV', subtitle: 'Análisis de las cadenas de valor y el desarrollo agroindustrial argentino.', isLive: false, hasMicrosCRA: true },
+                    3: { title: 'Diálogos con Chacra', subtitle: 'Entrevistas en profundidad con referentes, productores y autoridades del sector.', isLive: true, hasMicrosCRA: true },
+                    4: { title: 'Diálogos con Chacra', subtitle: 'Entrevistas en profundidad con referentes, productores y autoridades del sector.', isLive: true, hasMicrosCRA: true },
+                    5: { title: 'Diálogos con Chacra', subtitle: 'Entrevistas en profundidad con referentes, productores y autoridades del sector.', isLive: true, hasMicrosCRA: true }
+                }
+            },
+            {
+                id: 'slot-1100',
+                start: '11:00',
+                end: '11:30',
+                startMin: 11 * 60,
+                endMin: 11 * 60 + 30,
+                days: {
+                    1: { title: 'Pampero TV', subtitle: 'El noticiero federal del agro producido junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Pampero TV', subtitle: 'El noticiero federal del agro producido junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Pampero TV', subtitle: 'El noticiero federal del agro producido junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Pampero TV', subtitle: 'El noticiero federal del agro producido junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Pampero TV', subtitle: 'El noticiero federal del agro producido junto al INTA.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1130',
+                start: '11:30',
+                end: '12:00',
+                startMin: 11 * 60 + 30,
+                endMin: 12 * 60,
+                days: {
+                    1: { title: 'Mercados en Chacra TV', subtitle: 'Cotizaciones de granos, hacienda, análisis financiero y tendencias comerciales.', isLive: false, hasMicrosCRA: true },
+                    2: { title: 'Mercados en Chacra TV', subtitle: 'Cotizaciones de granos, hacienda, análisis financiero y tendencias comerciales.', isLive: false, hasMicrosCRA: true },
+                    3: { title: 'Mercados en Chacra TV', subtitle: 'Cotizaciones de granos, hacienda, análisis financiero y tendencias comerciales.', isLive: false, hasMicrosCRA: true },
+                    4: { title: 'Mercados en Chacra TV', subtitle: 'Cotizaciones de granos, hacienda, análisis financiero y tendencias comerciales.', isLive: false, hasMicrosCRA: true },
+                    5: { title: 'Mercados en Chacra TV', subtitle: 'Cotizaciones de granos, hacienda, análisis financiero y tendencias comerciales.', isLive: false, hasMicrosCRA: true }
+                }
+            },
+            {
+                id: 'slot-1200',
+                start: '12:00',
+                end: '13:00',
+                startMin: 12 * 60,
+                endMin: 13 * 60,
+                days: {
+                    1: { title: 'Chacra TV Noticias', subtitle: 'Edición del mediodía con toda la información agropecuaria, mercados y actualidad.', isLive: true, hasMicrosCRA: false },
+                    2: { title: 'Chacra TV Noticias', subtitle: 'Edición del mediodía con toda la información agropecuaria, mercados y actualidad.', isLive: true, hasMicrosCRA: false },
+                    3: { title: 'Chacra TV Noticias', subtitle: 'Edición del mediodía con toda la información agropecuaria, mercados y actualidad.', isLive: true, hasMicrosCRA: false },
+                    4: { title: 'Chacra TV Noticias', subtitle: 'Edición del mediodía con toda la información agropecuaria, mercados y actualidad.', isLive: true, hasMicrosCRA: false },
+                    5: { title: 'Chacra TV Noticias', subtitle: 'Edición del mediodía con toda la información agropecuaria, mercados y actualidad.', isLive: true, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1300',
+                start: '13:00',
+                end: '13:30',
+                startMin: 13 * 60,
+                endMin: 13 * 60 + 30,
+                days: {
+                    1: { title: 'Producción animal', subtitle: 'Ganadería, lechería, nutrición, sanidad y genética pecuaria.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Producción animal', subtitle: 'Ganadería, lechería, nutrición, sanidad y genética pecuaria.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Producción animal', subtitle: 'Ganadería, lechería, nutrición, sanidad y genética pecuaria.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Producción animal', subtitle: 'Ganadería, lechería, nutrición, sanidad y genética pecuaria.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Producción animal', subtitle: 'Ganadería, lechería, nutrición, sanidad y genética pecuaria.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1330',
+                start: '13:30',
+                end: '14:30',
+                startMin: 13 * 60 + 30,
+                endMin: 14 * 60 + 30,
+                days: {
+                    1: { title: 'El INTA en tu vida', subtitle: 'Innovación tecnológica, investigación y extensión rural junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'El INTA en tu vida', subtitle: 'Innovación tecnológica, investigación y extensión rural junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'El INTA en tu vida', subtitle: 'Innovación tecnológica, investigación y extensión rural junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'El INTA en tu vida', subtitle: 'Innovación tecnológica, investigación y extensión rural junto al INTA.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'El INTA en tu vida', subtitle: 'Innovación tecnológica, investigación y extensión rural junto al INTA.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1430',
+                start: '14:30',
+                end: '15:00',
+                startMin: 14 * 60 + 30,
+                endMin: 15 * 60,
+                days: {
+                    1: { title: 'Difusión empresarial', subtitle: 'Novedades comerciales, lanzamientos y soluciones para el productor agropecuario.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Difusión empresarial', subtitle: 'Novedades comerciales, lanzamientos y soluciones para el productor agropecuario.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Difusión empresarial', subtitle: 'Novedades comerciales, lanzamientos y soluciones para el productor agropecuario.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Difusión empresarial', subtitle: 'Novedades comerciales, lanzamientos y soluciones para el productor agropecuario.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Difusión empresarial', subtitle: 'Novedades comerciales, lanzamientos y soluciones para el productor agropecuario.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1500',
+                start: '15:00',
+                end: '16:00',
+                startMin: 15 * 60,
+                endMin: 16 * 60,
+                days: {
+                    1: { title: 'El INTA en tu vida', subtitle: 'Segunda entrega con desarrollos científicos, cultivos y economías regionales.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'El INTA en tu vida', subtitle: 'Segunda entrega con desarrollos científicos, cultivos y economías regionales.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'El INTA en tu vida', subtitle: 'Segunda entrega con desarrollos científicos, cultivos y economías regionales.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'El INTA en tu vida', subtitle: 'Segunda entrega con desarrollos científicos, cultivos y economías regionales.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'El INTA en tu vida', subtitle: 'Segunda entrega con desarrollos científicos, cultivos y economías regionales.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1600',
+                start: '16:00',
+                end: '16:30',
+                startMin: 16 * 60,
+                endMin: 16 * 60 + 30,
+                days: {
+                    1: { title: 'Agrolíderes', subtitle: 'Testimonios y visión estratégica de los líderes que impulsan el agro.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Agrolíderes', subtitle: 'Testimonios y visión estratégica de los líderes que impulsan el agro.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Agrolíderes', subtitle: 'Testimonios y visión estratégica de los líderes que impulsan el agro.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Agrolíderes', subtitle: 'Testimonios y visión estratégica de los líderes que impulsan el agro.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Agrolíderes', subtitle: 'Testimonios y visión estratégica de los líderes que impulsan el agro.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1630',
+                start: '16:30',
+                end: '17:00',
+                startMin: 16 * 60 + 30,
+                endMin: 17 * 60,
+                days: {
+                    1: { title: 'Actividad productiva', subtitle: 'Recorrida por los procesos productivos, maquinaria y trabajo a campo.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Actividad productiva', subtitle: 'Recorrida por los procesos productivos, maquinaria y trabajo a campo.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Actividad productiva', subtitle: 'Recorrida por los procesos productivos, maquinaria y trabajo a campo.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Actividad productiva', subtitle: 'Recorrida por los procesos productivos, maquinaria y trabajo a campo.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Actividad productiva', subtitle: 'Recorrida por los procesos productivos, maquinaria y trabajo a campo.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1700',
+                start: '17:00',
+                end: '17:30',
+                startMin: 17 * 60,
+                endMin: 17 * 60 + 30,
+                days: {
+                    1: { title: 'En el radar', subtitle: 'Actualización meteorológica y perspectivas climáticas para la producción.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'En el radar', subtitle: 'Actualización meteorológica y perspectivas climáticas para la producción.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'En el radar', subtitle: 'Actualización meteorológica y perspectivas climáticas para la producción.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'En el radar', subtitle: 'Actualización meteorológica y perspectivas climáticas para la producción.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'En el radar', subtitle: 'Actualización meteorológica y perspectivas climáticas para la producción.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1730',
+                start: '17:30',
+                end: '18:00',
+                startMin: 17 * 60 + 30,
+                endMin: 18 * 60,
+                days: {
+                    1: { title: 'Secretos verdes', subtitle: 'Horticultura, sustentabilidad, producción orgánica y cuidados ambientales.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Secretos verdes', subtitle: 'Horticultura, sustentabilidad, producción orgánica y cuidados ambientales.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Secretos verdes', subtitle: 'Horticultura, sustentabilidad, producción orgánica y cuidados ambientales.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Secretos verdes', subtitle: 'Horticultura, sustentabilidad, producción orgánica y cuidados ambientales.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Secretos verdes', subtitle: 'Horticultura, sustentabilidad, producción orgánica y cuidados ambientales.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1800',
+                start: '18:00',
+                end: '18:30',
+                startMin: 18 * 60,
+                endMin: 18 * 60 + 30,
+                days: {
+                    1: { title: 'Producción animal', subtitle: 'Especial vespertino sobre manejo ganadero, tambos y producción intensiva.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Producción animal', subtitle: 'Especial vespertino sobre manejo ganadero, tambos y producción intensiva.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Producción animal', subtitle: 'Especial vespertino sobre manejo ganadero, tambos y producción intensiva.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Producción animal', subtitle: 'Especial vespertino sobre manejo ganadero, tambos y producción intensiva.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Producción animal', subtitle: 'Especial vespertino sobre manejo ganadero, tambos y producción intensiva.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1830',
+                start: '18:30',
+                end: '19:00',
+                startMin: 18 * 60 + 30,
+                endMin: 19 * 60,
+                days: {
+                    1: { title: 'Agenda agraria', subtitle: 'Eventos, remates, exposiciones y el calendario de actividades del sector.', isLive: false, hasMicrosCRA: false },
+                    2: { title: 'Agenda agraria', subtitle: 'Eventos, remates, exposiciones y el calendario de actividades del sector.', isLive: false, hasMicrosCRA: false },
+                    3: { title: 'Agenda agraria', subtitle: 'Eventos, remates, exposiciones y el calendario de actividades del sector.', isLive: false, hasMicrosCRA: false },
+                    4: { title: 'Agenda agraria', subtitle: 'Eventos, remates, exposiciones y el calendario de actividades del sector.', isLive: false, hasMicrosCRA: false },
+                    5: { title: 'Agenda agraria', subtitle: 'Eventos, remates, exposiciones y el calendario de actividades del sector.', isLive: false, hasMicrosCRA: false }
+                }
+            },
+            {
+                id: 'slot-1900',
+                start: '19:00',
+                end: '20:00',
+                startMin: 19 * 60,
+                endMin: 20 * 60,
+                days: {
+                    1: { title: 'Chacra TV Noticias', subtitle: 'Edición central con el balance completo de la jornada agroindustrial y financiera.', isLive: true, hasMicrosCRA: false },
+                    2: { title: 'Chacra TV Noticias', subtitle: 'Edición central con el balance completo de la jornada agroindustrial y financiera.', isLive: true, hasMicrosCRA: false },
+                    3: { title: 'Chacra TV Noticias', subtitle: 'Edición central con el balance completo de la jornada agroindustrial y financiera.', isLive: true, hasMicrosCRA: false },
+                    4: { title: 'Chacra TV Noticias', subtitle: 'Edición central con el balance completo de la jornada agroindustrial y financiera.', isLive: true, hasMicrosCRA: false },
+                    5: { title: 'Chacra TV Noticias', subtitle: 'Edición central con el balance completo de la jornada agroindustrial y financiera.', isLive: true, hasMicrosCRA: false }
+                }
+            }
+        ];
+
+        const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+        // Estado de la aplicación
+        let appState = {
+            selectedFilterDay: 'all' // 'all' o '1'..'5'
+        };
+
+        /**
+         * Obtiene el objeto de tiempo actual del dispositivo
+         */
+        function getCurrentTime() {
+            const now = new Date();
+            return {
+                dayOfWeek: now.getDay(), // 0 = Domingo, 1 = Lunes ... 6 = Sábado
+                hours: now.getHours(),
+                minutes: now.getMinutes(),
+                seconds: now.getSeconds(),
+                totalMinutes: now.getHours() * 60 + now.getMinutes()
+            };
+        }
+
+        /**
+         * Formatea números a dos dígitos (ej. 9 -> "09")
+         */
+        function pad2(num) {
+            return String(num).padStart(2, '0');
+        }
+
+        /**
+         * Devuelve el nombre completo del programa incluyendo su edición si existe
+         */
+        function formatProgramFullName(prog) {
+            return prog.edition ? `${prog.title} (${prog.edition})` : prog.title;
+        }
+
+        /**
+         * Evalúa qué programa está al aire y cuál sigue según el día y hora actual
+         */
+        function evaluateBroadcastState(timeObj) {
+            const { dayOfWeek, totalMinutes } = timeObj;
+
+            // Fin de semana (Sábado = 6, Domingo = 0)
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                const firstSlot = SCHEDULE_SLOTS[0];
+                return {
+                    isOnAir: false,
+                    reason: 'weekend',
+                    dayOfWeek,
+                    next: {
+                        dayLabel: 'Lunes',
+                        timeLabel: `${firstSlot.start} hs`,
+                        program: firstSlot.days[1],
+                        countdownText: `Retoma el lunes a las ${firstSlot.start} hs`
+                    }
+                };
+            }
+
+            // Buscar si hay un bloque activo ahora
+            const currentSlot = SCHEDULE_SLOTS.find(s => totalMinutes >= s.startMin && totalMinutes < s.endMin);
+
+            if (currentSlot) {
+                const prog = currentSlot.days[dayOfWeek];
+                const durationMin = currentSlot.endMin - currentSlot.startMin;
+                const elapsedMin = totalMinutes - currentSlot.startMin;
+                const remainingMin = Math.max(1, currentSlot.endMin - totalMinutes);
+                const progressPercent = Math.min(100, Math.max(0, (elapsedMin / durationMin) * 100));
+
+                // Calcular siguiente bloque
+                const currentIndex = SCHEDULE_SLOTS.indexOf(currentSlot);
+                let nextInfo = null;
+
+                if (currentIndex < SCHEDULE_SLOTS.length - 1) {
+                    const nextSlot = SCHEDULE_SLOTS[currentIndex + 1];
+                    nextInfo = {
+                        dayLabel: `Hoy · ${DAY_NAMES[dayOfWeek]}`,
+                        timeLabel: `${nextSlot.start} hs`,
+                        program: nextSlot.days[dayOfWeek],
+                        countdownText: `Inicia en ${remainingMin} min`
+                    };
+                } else {
+                    const nextDay = dayOfWeek === 5 ? 1 : dayOfWeek + 1;
+                    const firstSlot = SCHEDULE_SLOTS[0];
+                    nextInfo = {
+                        dayLabel: dayOfWeek === 5 ? 'Lunes' : `Mañana · ${DAY_NAMES[nextDay]}`,
+                        timeLabel: `${firstSlot.start} hs`,
+                        program: firstSlot.days[nextDay],
+                        countdownText: `Próxima apertura: ${firstSlot.start} hs`
+                    };
+                }
+
+                return {
+                    isOnAir: true,
+                    dayOfWeek,
+                    slot: currentSlot,
+                    program: prog,
+                    elapsedMin,
+                    remainingMin,
+                    progressPercent,
+                    next: nextInfo
+                };
+            }
+
+            // Antes de las 07:00 hs
+            if (totalMinutes < SCHEDULE_SLOTS[0].startMin) {
+                const firstSlot = SCHEDULE_SLOTS[0];
+                const diffMin = firstSlot.startMin - totalMinutes;
+                return {
+                    isOnAir: false,
+                    reason: 'before_hours',
+                    dayOfWeek,
+                    next: {
+                        dayLabel: `Hoy · ${DAY_NAMES[dayOfWeek]}`,
+                        timeLabel: `${firstSlot.start} hs`,
+                        program: firstSlot.days[dayOfWeek],
+                        countdownText: diffMin <= 60 ? `Inicia en ${diffMin} min` : `Inicia a las ${firstSlot.start} hs`
+                    }
+                };
+            }
+
+            // Después de las 20:00 hs
+            const nextDay = dayOfWeek === 5 ? 1 : dayOfWeek + 1;
+            const firstSlot = SCHEDULE_SLOTS[0];
+            return {
+                isOnAir: false,
+                reason: 'after_hours',
+                dayOfWeek,
+                next: {
+                    dayLabel: dayOfWeek === 5 ? 'Lunes' : `Mañana · ${DAY_NAMES[nextDay]}`,
+                    timeLabel: `${firstSlot.start} hs`,
+                    program: firstSlot.days[nextDay],
+                    countdownText: `Apertura a las ${firstSlot.start} hs`
+                }
+            };
+        }
+
+        /**
+         * Renderiza la tabla semanal completa (Lunes a Viernes)
+         */
+        function renderScheduleTable() {
+            const tbody = document.getElementById('schedule-table-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = SCHEDULE_SLOTS.map(slot => {
+                const cellsHtml = [1, 2, 3, 4, 5].map(dayNum => {
+                    const prog = slot.days[dayNum];
+                    return `
+                        <td data-cell-key="${dayNum}-${slot.id}" data-cell-day="${dayNum}" class="p-3.5 align-top border-r last:border-r-0 border-slate-200/70 transition-colors">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="now-playing-indicator hidden items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider bg-chacra-dark text-chacra-wheat px-2 py-0.5 rounded-full">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> AL AIRE
+                                    </span>
+                                    ${prog.isLive ? '<span class="text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 px-2 py-0.5 rounded-full">EN VIVO</span>' : ''}
+                                    ${prog.hasMicrosCRA ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">+ Micros CRA</span>' : ''}
+                                </div>
+                                <div class="font-display font-bold text-slate-900 text-sm leading-snug">
+                                    ${prog.title}
+                                </div>
+                                ${prog.edition ? `<div class="text-xs font-semibold text-chacra-primary">${prog.edition}</div>` : ''}
+                            </div>
+                        </td>
+                    `;
+                }).join('');
+
+                return `
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="py-3.5 px-4 font-display font-bold text-xs text-chacra-dark bg-slate-50/95 border-r border-slate-200/80 sticky left-0 z-10 whitespace-nowrap align-top">
+                            <div>${slot.start}</div>
+                            <div class="text-[11px] font-medium text-slate-400">a ${slot.end}</div>
+                        </td>
+                        ${cellsHtml}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Renderiza las tarjetas de un único día cuando se selecciona un filtro específico
+         */
+        function renderSingleDayCards(dayNum, activeSlotId) {
+            const wrapper = document.getElementById('single-day-cards-wrapper');
+            if (!wrapper) return;
+
+            wrapper.innerHTML = SCHEDULE_SLOTS.map(slot => {
+                const prog = slot.days[dayNum];
+                const isCurrent = slot.id === activeSlotId;
+
+                return `
+                    <div class="rounded-2xl p-4 sm:p-5 border transition-all ${isCurrent ? 'bg-chacra-mint/50 border-chacra-primary ring-2 ring-chacra-primary/40 shadow-md' : 'bg-white border-slate-200/90 shadow-sm'}">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-display font-extrabold text-sm text-chacra-dark bg-slate-100 px-3 py-1 rounded-xl">
+                                    ${slot.start} - ${slot.end} hs
+                                </span>
+                                ${isCurrent ? '<span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider bg-chacra-dark text-chacra-wheat px-2.5 py-1 rounded-full"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> AL AIRE AHORA</span>' : ''}
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                ${prog.isLive ? '<span class="text-[11px] font-bold uppercase tracking-wider bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full">EN VIVO</span>' : ''}
+                                ${prog.hasMicrosCRA ? '<span class="text-[11px] font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">+ Micros CRA</span>' : ''}
+                            </div>
+                        </div>
+                        <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">
+                            ${formatProgramFullName(prog)}
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1">${prog.subtitle}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Actualiza toda la interfaz de usuario cada segundo
+         */
+        function updateUI() {
+            const timeObj = getCurrentTime();
+            const state = evaluateBroadcastState(timeObj);
+
+            // 1. Actualizar Reloj y Fecha en Header
+            const clockEl = document.getElementById('live-clock');
+            const dateLabelEl = document.getElementById('live-date-label');
+            clockEl.textContent = `${pad2(timeObj.hours)}:${pad2(timeObj.minutes)}:${pad2(timeObj.seconds)}`;
+            dateLabelEl.textContent = `${DAY_NAMES[timeObj.dayOfWeek]} · En vivo`;
+
+            // 2. Actualizar Tarjeta Principal ("Ahora en Emisión")
+            const statusBadge = document.getElementById('status-badge');
+            const statusBadgeText = document.getElementById('status-badge-text');
+            const currentSlotTime = document.getElementById('current-slot-time');
+            const microsBadge = document.getElementById('micros-badge');
+            const contextLabel = document.getElementById('current-context-label');
+            const titleEl = document.getElementById('current-program-title');
+            const subtitleEl = document.getElementById('current-program-subtitle');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressElapsed = document.getElementById('progress-elapsed');
+            const progressRemaining = document.getElementById('progress-remaining');
+
+            if (state.isOnAir) {
+                const prog = state.program;
+                contextLabel.textContent = `Ahora en pantalla · ${DAY_NAMES[state.dayOfWeek]}`;
+                titleEl.textContent = formatProgramFullName(prog);
+                subtitleEl.textContent = prog.subtitle;
+                currentSlotTime.textContent = `${state.slot.start} a ${state.slot.end} hs`;
+
+                // Badge EN VIVO vs AL AIRE
+                if (prog.isLive) {
+                    statusBadge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-600 text-white shadow-sm';
+                    statusBadgeText.textContent = 'EN VIVO';
+                } else {
+                    statusBadge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-sm';
+                    statusBadgeText.textContent = 'EN EMISIÓN';
+                }
+
+                // Badge Micros CRA
+                if (prog.hasMicrosCRA) {
+                    microsBadge.classList.remove('hidden');
+                    microsBadge.classList.add('inline-flex');
+                } else {
+                    microsBadge.classList.add('hidden');
+                    microsBadge.classList.remove('inline-flex');
+                }
+
+                // Barra de progreso
+                progressContainer.classList.remove('hidden');
+                progressBar.style.width = `${state.progressPercent.toFixed(1)}%`;
+                progressElapsed.textContent = `Transcurrido: ${state.elapsedMin} min`;
+                progressRemaining.textContent = `Restan: ${state.remainingMin} min`;
+
+            } else {
+                // Fuera de franja habitual o fin de semana
+                statusBadge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-700/90 text-slate-200 border border-white/15';
+                statusBadgeText.textContent = 'PROGRAMACIÓN CONTINUA';
+                currentSlotTime.textContent = 'Grilla Habitual: 07:00 a 20:00 hs';
+                microsBadge.classList.add('hidden');
+                microsBadge.classList.remove('inline-flex');
+                progressContainer.classList.add('hidden');
+
+                if (state.reason === 'weekend') {
+                    contextLabel.textContent = `Fin de semana · ${DAY_NAMES[state.dayOfWeek]}`;
+                    titleEl.textContent = 'Edición Especial de Fin de Semana';
+                    subtitleEl.textContent = `La grilla habitual de Chacra TV retoma el ${state.next.dayLabel} a las ${state.next.timeLabel} con ${formatProgramFullName(state.next.program)}.`;
+                } else if (state.reason === 'before_hours') {
+                    contextLabel.textContent = `Madrugada · ${DAY_NAMES[state.dayOfWeek]}`;
+                    titleEl.textContent = 'Apertura de Transmisión a las 07:00 hs';
+                    subtitleEl.textContent = `En instantes comienza la programación diaria de Chacra TV con ${formatProgramFullName(state.next.program)}.`;
+                } else {
+                    contextLabel.textContent = `Cierre de grilla diaria · ${DAY_NAMES[state.dayOfWeek]}`;
+                    titleEl.textContent = 'Programación Especial Nocturna';
+                    subtitleEl.textContent = `La grilla habitual vuelve ${state.next.dayLabel.toLowerCase()} a las ${state.next.timeLabel} con ${formatProgramFullName(state.next.program)}.`;
+                }
+            }
+
+            // 3. Actualizar Tarjeta Secundaria ("A Continuación")
+            if (state.next) {
+                document.getElementById('next-day-label').textContent = state.next.dayLabel;
+                document.getElementById('next-slot-time').textContent = state.next.timeLabel;
+                document.getElementById('next-program-title').textContent = formatProgramFullName(state.next.program);
+                document.getElementById('next-program-detail').textContent = state.next.program.subtitle;
+                document.getElementById('countdown-next').textContent = state.next.countdownText;
+            }
+
+            // 4. Resaltar Columna del Día y Celda Activa en la Tabla
+            const activeDay = (timeObj.dayOfWeek >= 1 && timeObj.dayOfWeek <= 5) ? timeObj.dayOfWeek : null;
+            const activeSlotId = state.isOnAir ? state.slot.id : null;
+
+            // Encabezados de días
+            document.querySelectorAll('th[data-col-day]').forEach(th => {
+                const colDay = parseInt(th.getAttribute('data-col-day'), 10);
+                const todayTag = th.querySelector('.day-today-tag');
+                if (colDay === activeDay) {
+                    th.classList.add('bg-chacra-primary', 'text-chacra-wheat');
+                    todayTag.classList.remove('hidden');
+                } else {
+                    th.classList.remove('bg-chacra-primary', 'text-chacra-wheat');
+                    todayTag.classList.add('hidden');
+                }
+            });
+
+            // Celdas de la tabla
+            document.querySelectorAll('td[data-cell-key]').forEach(td => {
+                const cellKey = td.getAttribute('data-cell-key');
+                const cellDay = parseInt(td.getAttribute('data-cell-day'), 10);
+                const indicator = td.querySelector('.now-playing-indicator');
+
+                const isCurrentCell = activeDay && activeSlotId && cellKey === `${activeDay}-${activeSlotId}`;
+
+                if (isCurrentCell) {
+                    td.classList.add('bg-chacra-mint/70', 'ring-2', 'ring-inset', 'ring-chacra-primary');
+                    td.classList.remove('bg-chacra-mint/15');
+                    indicator.classList.remove('hidden');
+                    indicator.classList.add('inline-flex');
+                } else if (cellDay === activeDay) {
+                    td.classList.add('bg-chacra-mint/15');
+                    td.classList.remove('bg-chacra-mint/70', 'ring-2', 'ring-inset', 'ring-chacra-primary');
+                    indicator.classList.add('hidden');
+                    indicator.classList.remove('inline-flex');
+                } else {
+                    td.classList.remove('bg-chacra-mint/70', 'bg-chacra-mint/15', 'ring-2', 'ring-inset', 'ring-chacra-primary');
+                    indicator.classList.add('hidden');
+                    indicator.classList.remove('inline-flex');
+                }
+            });
+
+            // 5. Si está activo el filtro de un solo día en móvil/desktop, actualizar sus tarjetas
+            if (appState.selectedFilterDay !== 'all') {
+                const filterDayNum = parseInt(appState.selectedFilterDay, 10);
+                renderSingleDayCards(filterDayNum, filterDayNum === activeDay ? activeSlotId : null);
+            }
+        }
+
+        /**
+         * Inicialización de los filtros por día
+         */
+        function initControls() {
+            const filterBtns = document.querySelectorAll('.day-filter-btn');
+            const desktopWrapper = document.getElementById('desktop-grid-wrapper');
+            const singleDayWrapper = document.getElementById('single-day-cards-wrapper');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selectedDay = btn.getAttribute('data-filter-day');
+                    appState.selectedFilterDay = selectedDay;
+
+                    // Actualizar estilos de botones
+                    filterBtns.forEach(b => {
+                        b.className = 'day-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer whitespace-nowrap';
+                    });
+                    btn.className = 'day-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-chacra-dark text-white shadow-sm transition-all cursor-pointer whitespace-nowrap';
+
+                    if (selectedDay === 'all') {
+                        desktopWrapper.classList.remove('hidden');
+                        singleDayWrapper.classList.add('hidden');
+                    } else {
+                        desktopWrapper.classList.add('hidden');
+                        singleDayWrapper.classList.remove('hidden');
+                    }
+
+                    updateUI();
+                });
+            });
+        }
+
+        // Arranque al cargar la ventana
+        window.addEventListener('DOMContentLoaded', () => {
+            renderScheduleTable();
+            initControls();
+            updateUI();
+
+            // Iconos Lucide
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+            // Actualizar cada segundo
+            setInterval(updateUI, 1000);
+        });
+    </script>
+</body>
+</html>
