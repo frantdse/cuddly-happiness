@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chacra TV | Programación Oficial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        chacra: {
+                            950: '#0B2017',
+                            900: '#153829',
+                            700: '#245942',
+                            500: '#3B8765',
+                            100: '#E6F4ED',
+                            gold: '#F2C96B',
+                            wheat: '#D9A752',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes pulse-ring {
+            0% { transform: scale(0.85); opacity: 0.9; }
+            100% { transform: scale(2.4); opacity: 0; }
+        }
+        .live-dot::before {
+            content: ''; position: absolute; inset: 0; border-radius: 9999px;
+            background: #ef4444; animation: pulse-ring 1.6s ease-out infinite;
+        }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-[#F6F7F5] text-slate-800 antialiased min-h-screen flex flex-col selection:bg-chacra-700 selection:text-white">
+
+    <!-- NAVBAR SUPERIOR -->
+    <header class="bg-chacra-950/95 text-white sticky top-0 z-40 border-b border-white/10 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-chacra-500 to-chacra-900 flex items-center justify-center border border-chacra-gold/40 shadow-md">
+                    <i data-lucide="sprout" class="w-5 h-5 text-chacra-gold"></i>
+                </div>
+                <div>
+                    <span class="font-display font-extrabold text-xl tracking-tight">CHACRA<span class="text-chacra-gold">TV</span></span>
+                    <span class="hidden sm:inline-block ml-2.5 text-[11px] text-emerald-200/75 font-medium border-l border-white/15 pl-2.5">El canal del campo y la agroindustria</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="#grilla" class="hidden md:inline-block text-xs font-medium text-slate-300 hover:text-white transition-colors">Grilla completa</a>
+                <div class="flex items-center gap-2 bg-black/40 px-3.5 py-1.5 rounded-full border border-white/10">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="live-date" class="text-xs text-slate-300 capitalize hidden sm:inline">--</span>
+                    <span id="live-clock" class="font-display font-bold text-sm text-chacra-gold tabular-nums">--:--:--</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO CON FONDO FOTOGRÁFICO DE CAMPO AL AMANECER -->
+    <section class="relative bg-chacra-950 text-white overflow-hidden">
+        <!-- Imagen de fondo del campo -->
+        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2000&q=80" 
+             alt="Campos dorados al amanecer" 
+             class="absolute inset-0 w-full h-full object-cover object-center opacity-45 scale-105">
+        <!-- Degradado cinematográfico -->
+        <div class="absolute inset-0 bg-gradient-to-r from-chacra-950 via-chacra-950/85 to-chacra-950/50"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#F6F7F5] via-transparent to-black/30"></div>
+
+        <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 sm:pt-14 sm:pb-20">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                
+                <!-- TARJETA PRINCIPAL: EN EMISIÓN -->
+                <div class="lg:col-span-8 bg-chacra-950/75 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/15 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2.5 mb-5">
+                            <span id="hero-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-600 text-white shadow-sm">
+                                <span class="relative flex h-2 w-2 live-dot"><span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span></span>
+                                <span id="hero-badge-text">EN VIVO</span>
+                            </span>
+                            <span id="hero-time" class="text-xs font-semibold bg-white/10 px-3 py-1 rounded-full text-chacra-gold border border-white/10">--:-- a --:-- hs</span>
+                            <span id="hero-cra" class="hidden items-center gap-1 text-[11px] font-bold bg-chacra-gold text-chacra-950 px-2.5 py-1 rounded-full">
+                                <i data-lucide="sparkles" class="w-3 h-3"></i> + Micros CRA
+                            </span>
+                        </div>
+
+                        <p id="hero-context" class="text-xs font-semibold text-emerald-300/90 uppercase tracking-widest mb-1.5">Ahora en pantalla</p>
+                        <h1 id="hero-title" class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[42px] tracking-tight leading-tight text-white">
+                            Cargando programación...
+                        </h1>
+                        <p id="hero-subtitle" class="text-sm sm:text-base text-slate-200/90 mt-3 max-w-2xl leading-relaxed">--</p>
+                    </div>
+
+                    <!-- Barra de progreso -->
+                    <div id="hero-progress-wrap" class="mt-8 pt-4 border-t border-white/15">
+                        <div class="flex justify-between text-xs font-medium text-slate-300 mb-2">
+                            <span id="hero-elapsed">Transcurrido: 0m</span>
+                            <span id="hero-remaining" class="text-chacra-gold font-semibold">Restan: --</span>
+                        </div>
+                        <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden p-0.5">
+                            <div id="hero-progress-bar" class="h-full bg-gradient-to-r from-chacra-wheat to-chacra-gold rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TARJETA SECUNDARIA: A CONTINUACIÓN -->
+                <div class="lg:col-span-4 bg-white/95 backdrop-blur-xl text-slate-800 rounded-3xl p-6 sm:p-7 border border-white shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-chacra-700 bg-chacra-100 px-3 py-1 rounded-full">
+                                <i data-lucide="fast-forward" class="w-3.5 h-3.5"></i> A continuación
+                            </span>
+                            <span id="next-time" class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">--:-- hs</span>
+                        </div>
+
+                        <p id="next-day" class="text-[11px] font-bold text-chacra-wheat uppercase tracking-wider mb-1">Próximo bloque</p>
+                        <h2 id="next-title" class="font-display font-bold text-xl text-slate-900 leading-snug">--</h2>
+                        <p id="next-subtitle" class="text-sm text-slate-500 mt-2 leading-relaxed">--</p>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+                            <i data-lucide="clock" class="w-4 h-4 text-chacra-500"></i>
+                            <span id="next-countdown">Inicia en --</span>
+                        </span>
+                        <a href="#grilla" class="font-bold text-chacra-700 hover:text-chacra-950 transition-colors">Ver grilla ↓</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 -mt-4 space-y-12 pb-16">
+
+        <!-- TIRA VISUAL: CONEXIÓN AGRO Y MERCADOS GLOBALES (CAMPO · MANHATTAN · LONDRES) -->
+        <section aria-label="Cobertura agroindustrial y mercados" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Card 1: Campo Argentino -->
+            <div class="group relative h-36 rounded-2xl overflow-hidden shadow-sm border border-slate-200/80">
+                <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&q=80" 
+                     alt="Producción agrícola en el campo" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-chacra-950/90 via-chacra-950/40 to-transparent"></div>
+                <div class="absolute bottom-3.5 left-4 right-4 text-white">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-chacra-gold">Producción & Clima</span>
+                    <h3 class="font-display font-bold text-base leading-tight">El Campo en Tiempo Real</h3>
+                    <p class="text-[11px] text-slate-200/85 mt-0.5">Tecnología, ganadería y pronósticos con el INTA.</p>
+                </div>
+            </div>
+
+            <!-- Card 2: Manhattan / Mercados Internacionales -->
+            <div class="group relative h-36 rounded-2xl overflow-hidden shadow-sm border border-slate-200/80">
+                <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80" 
+                     alt="Skyline financiero de Manhattan" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-transparent"></div>
+                <div class="absolute bottom-3.5 left-4 right-4 text-white">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Mercados · Manhattan & Chicago</span>
+                    <h3 class="font-display font-bold text-base leading-tight">Cotizaciones y Finanzas</h3>
+                    <p class="text-[11px] text-slate-200/85 mt-0.5">Granos, divisas y tendencias globales del agro.</p>
+                </div>
+            </div>
+
+            <!-- Card 3: Londres / Comercio Exterior -->
+            <div class="group relative h-36 rounded-2xl overflow-hidden shadow-sm border border-slate-200/80">
+                <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80" 
+                     alt="Distrito financiero de Londres" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-transparent"></div>
+                <div class="absolute bottom-3.5 left-4 right-4 text-white">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-amber-300">Comercio Global · Londres</span>
+                    <h3 class="font-display font-bold text-base leading-tight">Agroindustria al Mundo</h3>
+                    <p class="text-[11px] text-slate-200/85 mt-0.5">Exportaciones, mercados europeos y análisis.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRILLA DE PROGRAMACIÓN ULTRA-CLARA -->
+        <section id="grilla" class="space-y-5">
+            <!-- Encabezado y Controles -->
+            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight">Grilla de Programación</h2>
+                            <span class="text-xs font-bold bg-chacra-100 text-chacra-700 px-2.5 py-0.5 rounded-full">Lunes a Viernes · 24 hs</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                            La programación base es igual de lunes a viernes. Los días con cambios especiales se muestran separados para una lectura rápida.
+                        </p>
+                    </div>
+
+                    <!-- Buscador rápido -->
+                    <div class="relative w-full md:w-64">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input id="search-input" type="text" placeholder="Buscar programa..." 
+                               class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-chacra-500 focus:bg-white transition-all">
+                    </div>
+                </div>
+
+                <!-- Filtros por Categoría / Día -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                    <div id="category-filters" class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                        <button data-cat="all" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-chacra-900 text-white shadow-sm cursor-pointer whitespace-nowrap">Todos los bloques</button>
+                        <button data-cat="live" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer whitespace-nowrap">🔴 En Vivo</button>
+                        <button data-cat="news" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer whitespace-nowrap">📰 Noticias y Mercados</button>
+                        <button data-cat="field" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer whitespace-nowrap">🌾 Campo e INTA</button>
+                    </div>
+
+                    <!-- Guía visual de etiquetas -->
+                    <div class="flex items-center gap-4 text-[11px] text-slate-500">
+                        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span> En vivo</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> + Micros CRA</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-chacra-100 border border-chacra-500"></span> Al aire ahora</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LISTA / TABLA INTELIGENTE DE HORARIOS -->
+            <div id="schedule-list" class="space-y-2.5">
+                <!-- Generado dinámicamente por JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-chacra-950 text-slate-400 py-8 border-t border-white/10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="font-display font-extrabold text-white text-sm">CHACRA<span class="text-chacra-gold">TV</span></span>
+                <span>·</span>
+                <span>Horario Oficial de Argentina (GMT-3)</span>
+            </div>
+            <span>Grilla sincronizada automáticamente en tiempo real</span>
+        </div>
+    </footer>
+
+    <script>
+        const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+        // Grilla estructurada: incluye categoría y excepciones puntuales por día
+        const SLOTS = [
+            {
+                start: '07:00', end: '09:00', cat: 'news',
+                base: { title: 'Mañana Express', sub: 'Toda la actualidad agropecuaria, clima y mercados para arrancar la jornada.' }
+            },
+            {
+                start: '09:00', end: '09:30', cat: 'field',
+                base: { title: 'Nombres que Dejan Marca', sub: 'Historias de vida y protagonistas fundamentales del sector agroindustrial.' }
+            },
+            {
+                start: '09:30', end: '10:00', cat: 'news',
+                base: { title: 'Chacra TV Noticias', ed: '1° Edición', sub: 'El resumen informativo matutino con las noticias clave del campo.', live: true, cra: true }
+            },
+            {
+                start: '10:00', end: '10:30', cat: 'field',
+                // Este bloque cambia los Lunes vs Martes a Viernes
+                splitDays: [
+                    { daysLabel: 'Lunes', days: [1], prog: { title: 'Agroindustriales en Chacra TV', sub: 'Análisis de las cadenas de valor y el desarrollo agroindustrial.' } },
+                    { daysLabel: 'Martes a Viernes', days: [2, 3, 4, 5], prog: { title: 'En el radar', ed: 'con Mauricio Saldívar', sub: 'Pronóstico meteorológico especializado y tendencias climáticas para el agro.' } }
+                ]
+            },
+            {
+                start: '10:30', end: '11:00', cat: 'field',
+                // Este bloque cambia los Martes vs Lunes, Miércoles, Jueves y Viernes
+                splitDays: [
+                    { daysLabel: 'Lun, Mié, Jue y Vie', days: [1, 3, 4, 5], prog: { title: 'Diálogos con Chacra', sub: 'Entrevistas en profundidad con referentes, productores y autoridades del sector.', live: true, cra: true } },
+                    { daysLabel: 'Martes', days: [2], prog: { title: 'Agroindustriales en Chacra TV', sub: 'Análisis de las cadenas de valor y el desarrollo agroindustrial.', live: false, cra: true } }
+                ]
+            },
+            {
+                start: '11:00', end: '11:30', cat: 'field',
+                base: { title: 'Pampero TV', sub: 'El noticiero federal del agro producido junto al INTA.' }
+            },
+            {
+                start: '11:30', end: '12:00', cat: 'news',
+                base: { title: 'Mercados en Chacra TV', sub: 'Cotizaciones de granos, hacienda, divisas y tendencias comerciales.', cra: true }
+            },
+            {
+                start: '12:00', end: '13:00', cat: 'news',
+                base: { title: 'Chacra TV Noticias', ed: 'Edición Mediodía', sub: 'Toda la información agropecuaria, mercados y actualidad en vivo.', live: true }
+            },
+            {
+                start: '13:00', end: '13:30', cat: 'field',
+                base: { title: 'Producción animal', sub: 'Ganadería, lechería, nutrición, sanidad y genética pecuaria.' }
+            },
+            {
+                start: '13:30', end: '14:30', cat: 'field',
+                base: { title: 'El INTA en tu vida', sub: 'Innovación tecnológica, investigación y extensión rural en todo el país.' }
+            },
+            {
+                start: '14:30', end: '15:00', cat: 'field',
+                base: { title: 'Difusión empresarial', sub: 'Novedades comerciales, lanzamientos y soluciones para el productor.' }
+            },
+            {
+                start: '15:00', end: '16:00', cat: 'field',
+                base: { title: 'El INTA en tu vida', sub: 'Segunda entrega con desarrollos científicos, cultivos y economías regionales.' }
+            },
+            {
+                start: '16:00', end: '16:30', cat: 'field',
+                base: { title: 'Agrolíderes', sub: 'Testimonios y visión estratégica de los líderes que impulsan el agro.' }
+            },
+            {
+                start: '16:30', end: '17:00', cat: 'field',
+                base: { title: 'Actividad productiva', sub: 'Recorrida por los procesos productivos, maquinaria y trabajo a campo.' }
+            },
+            {
+                start: '17:00', end: '17:30', cat: 'field',
+                base: { title: 'En el radar', sub: 'Actualización meteorológica y perspectivas climáticas.' }
+            },
+            {
+                start: '17:30', end: '18:00', cat: 'field',
+                base: { title: 'Secretos verdes', sub: 'Horticultura, sustentabilidad, producción orgánica y cuidados ambientales.' }
+            },
+            {
+                start: '18:00', end: '18:30', cat: 'field',
+                base: { title: 'Producción animal', sub: 'Especial vespertino sobre manejo ganadero, tambos y producción intensiva.' }
+            },
+            {
+                start: '18:30', end: '19:00', cat: 'news',
+                base: { title: 'Agenda agraria', sub: 'Eventos, remates, exposiciones y el calendario de actividades del sector.' }
+            },
+            {
+                start: '19:00', end: '20:00', cat: 'news',
+                base: { title: 'Chacra TV Noticias', ed: 'Edición Central', sub: 'El balance completo de la jornada agroindustrial y financiera.', live: true }
+            },
+            {
+                start: '20:00', end: '07:00', cat: 'night', night: true,
+                base: { title: 'Programación Nocturna', sub: 'Repeticiones destacadas, especiales agroindustriales y ciclos temáticos de Chacra TV.' }
+            }
+        ].map((slot, idx) => {
+            const [sh, sm] = slot.start.split(':').map(Number);
+            const [eh, em] = slot.end.split(':').map(Number);
+            const startMin = sh * 60 + sm;
+            const endMin = eh * 60 + em <= startMin ? (eh * 60 + em) + 1440 : eh * 60 + em;
+            return { ...slot, id: `slot-${idx}`, startMin, endMin };
+        });
+
+        let activeCategory = 'all';
+        let searchQuery = '';
+
+        const pad = n => String(n).padStart(2, '0');
+        const fullName = p => p.ed ? `${p.title} (${p.ed})` : p.title;
+
+        function getProgForDay(slot, day) {
+            if (slot.splitDays) {
+                const match = slot.splitDays.find(g => g.days.includes(day));
+                return match ? match.prog : slot.splitDays[0].prog;
+            }
+            return slot.base;
+        }
+
+        function getBroadcastState() {
+            const now = new Date();
+            const day = now.getDay();
+            const mins = now.getHours() * 60 + now.getMinutes();
+
+            const effectiveMins = (day >= 1 && day <= 5 && mins < 7 * 60) ? mins + 1440 : mins;
+            const effectiveDay = (day >= 1 && day <= 5 && mins < 7 * 60) ? (day === 1 ? 5 : day - 1) : day;
+            const isSaturdayMorning = day === 6 && mins < 7 * 60;
+
+            if ((day === 0 || day === 6) && !isSaturdayMorning) {
+                return {
+                    onAir: false,
+                    next: { dayLabel: 'Lunes', time: '07:00 hs', prog: getProgForDay(SLOTS[0], 1), countdown: 'Retoma el lunes 07:00 hs' }
+                };
+            }
+
+            const activeDay = isSaturdayMorning ? 5 : effectiveDay;
+            const activeMins = isSaturdayMorning ? mins + 1440 : effectiveMins;
+            const slotIdx = SLOTS.findIndex(s => activeMins >= s.startMin && activeMins < s.endMin);
+
+            if (slotIdx === -1) return { onAir: false };
+
+            const slot = SLOTS[slotIdx];
+            const prog = getProgForDay(slot, activeDay);
+            const elapsed = activeMins - slot.startMin;
+            const remaining = slot.endMin - activeMins;
+            const pct = Math.min(100, Math.max(0, (elapsed / (slot.endMin - slot.startMin)) * 100));
+
+            const isLast = slotIdx === SLOTS.length - 1;
+            const nextSlot = isLast ? SLOTS[0] : SLOTS[slotIdx + 1];
+            const nextDay = isLast ? (activeDay === 5 ? 1 : activeDay + 1) : activeDay;
+
+            return {
+                onAir: true,
+                day: activeDay,
+                slot,
+                prog,
+                elapsed,
+                remaining,
+                pct,
+                next: {
+                    dayLabel: isLast ? (activeDay === 5 ? 'Lunes' : `Mañana · ${DAYS[nextDay]}`) : `Hoy · ${DAYS[activeDay]}`,
+                    time: `${nextSlot.start} hs`,
+                    prog: getProgForDay(nextSlot, nextDay),
+                    countdown: remaining > 60 ? `Inicia a las ${nextSlot.start} hs` : `Inicia en ${remaining} min`
+                }
+            };
+        }
+
+        function renderScheduleList(activeSlotId, activeDay) {
+            const container = document.getElementById('schedule-list');
+            const q = searchQuery.toLowerCase().trim();
+
+            const filtered = SLOTS.filter(slot => {
+                // Filtro de categoría
+                if (activeCategory === 'live') {
+                    const hasLive = slot.base?.live || slot.splitDays?.some(g => g.prog.live);
+                    if (!hasLive) return false;
+                } else if (activeCategory !== 'all' && slot.cat !== activeCategory) {
+                    return false;
+                }
+
+                // Filtro de búsqueda
+                if (q) {
+                    const textPool = slot.base 
+                        ? `${slot.base.title} ${slot.base.ed || ''} ${slot.base.sub}`
+                        : slot.splitDays.map(g => `${g.prog.title} ${g.prog.ed || ''} ${g.prog.sub}`).join(' ');
+                    if (!textPool.toLowerCase().includes(q)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 text-center border border-slate-200/80">
+                        <p class="font-display font-bold text-slate-700">No encontramos programas con ese filtro</p>
+                        <p class="text-xs text-slate-500 mt-1">Probá con otro término o volvé a "Todos los bloques".</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(slot => {
+                const isNow = slot.id === activeSlotId;
+                const isNight = slot.night;
+
+                // Caso A: Horario con programas distintos según el día (10:00 y 10:30)
+                if (slot.splitDays) {
+                    const colsHtml = slot.splitDays.map(group => {
+                        const isTodayGroup = activeDay && group.days.includes(activeDay);
+                        const isThisCellLive = isNow && isTodayGroup;
+                        const p = group.prog;
+
+                        return `
+                            <div class="p-4 rounded-2xl border transition-all ${isThisCellLive ? 'bg-chacra-100/80 border-chacra-500 ring-1 ring-chacra-500' : isTodayGroup ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50/70 border-slate-200/70'}">
+                                <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+                                    <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${isTodayGroup ? 'bg-chacra-900 text-chacra-gold' : 'bg-slate-200/80 text-slate-700'}">
+                                        ${group.daysLabel}
+                                    </span>
+                                    <div class="flex items-center gap-1">
+                                        ${isThisCellLive ? '<span class="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase bg-red-600 text-white px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> AL AIRE</span>' : ''}
+                                        ${p.live ? '<span class="text-[10px] font-bold uppercase bg-red-100 text-red-700 px-2 py-0.5 rounded-full">EN VIVO</span>' : ''}
+                                        ${p.cra ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">+ Micros CRA</span>' : ''}
+                                    </div>
+                                </div>
+                                <h3 class="font-display font-bold text-base text-slate-900">${fullName(p)}</h3>
+                                <p class="text-xs text-slate-600 mt-1 leading-relaxed">${p.sub}</p>
+                            </div>
+                        `;
+                    }).join('');
+
+                    return `
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border transition-all ${isNow ? 'border-chacra-500 shadow-md ring-1 ring-chacra-500/30' : 'border-slate-200/80 shadow-xs hover:border-slate-300'}">
+                            <div class="flex flex-col md:flex-row md:items-start gap-4">
+                                <!-- Columna Horario -->
+                                <div class="md:w-36 shrink-0 flex md:flex-col items-center md:items-start justify-between border-b md:border-b-0 pb-2.5 md:pb-0 border-slate-100">
+                                    <div class="font-display font-extrabold text-base sm:text-lg text-chacra-900 tabular-nums">
+                                        ${slot.start} <span class="text-slate-400 font-normal text-sm">a ${slot.end}</span>
+                                    </div>
+                                    <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/70 px-2 py-0.5 rounded-full mt-1">
+                                        Varía según el día
+                                    </span>
+                                </div>
+                                <!-- Bloques divididos por días -->
+                                <div class="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    ${colsHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Caso B: Horario unificado Lunes a Viernes (lectura súper limpia)
+                const p = slot.base;
+                return `
+                    <div class="rounded-2xl p-4 sm:p-5 border transition-all ${
+                        isNow 
+                            ? 'bg-chacra-100/75 border-chacra-500 shadow-md ring-1 ring-chacra-500/40' 
+                            : isNight 
+                                ? 'bg-chacra-950 text-white border-chacra-900' 
+                                : 'bg-white border-slate-200/80 shadow-xs hover:border-slate-300'
+                    }">
+                        <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
+                            <!-- Horario -->
+                            <div class="md:w-36 shrink-0 flex md:flex-col items-center md:items-start justify-between">
+                                <div class="font-display font-extrabold text-base sm:text-lg tabular-nums ${isNight && !isNow ? 'text-chacra-gold' : 'text-chacra-900'}">
+                                    ${slot.start} <span class="font-normal text-sm ${isNight && !isNow ? 'text-slate-400' : 'text-slate-400'}">a ${slot.end}</span>
+                                </div>
+                                <span class="text-[11px] font-medium ${isNight && !isNow ? 'text-slate-400' : 'text-slate-400'}">Lunes a Viernes</span>
+                            </div>
+
+                            <!-- Contenido del programa -->
+                            <div class="flex-grow">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                    ${isNow ? '<span class="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider bg-chacra-900 text-chacra-gold px-2.5 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> AL AIRE AHORA</span>' : ''}
+                                    ${isNight ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-indigo-200 px-2.5 py-0.5 rounded-full"><i data-lucide="moon" class="w-3 h-3"></i> Franja Nocturna</span>' : ''}
+                                    ${p.live ? '<span class="text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 px-2 py-0.5 rounded-full">EN VIVO</span>' : ''}
+                                    ${p.cra ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">+ Micros CRA</span>' : ''}
+                                </div>
+                                <h3 class="font-display font-bold text-base sm:text-lg leading-snug ${isNight && !isNow ? 'text-white' : 'text-slate-900'}">
+                                    ${fullName(p)}
+                                </h3>
+                                <p class="text-xs sm:text-sm mt-0.5 leading-relaxed ${isNight && !isNow ? 'text-slate-300' : 'text-slate-600'}">
+                                    ${p.sub}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        let lastRenderedKey = '';
+
+        function tick() {
+            const now = new Date();
+            document.getElementById('live-clock').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            document.getElementById('live-date').textContent = DAYS[now.getDay()];
+
+            const state = getBroadcastState();
+            const badge = document.getElementById('hero-badge');
+            const badgeText = document.getElementById('hero-badge-text');
+            const cra = document.getElementById('hero-cra');
+            const progWrap = document.getElementById('hero-progress-wrap');
+
+            if (state.onAir) {
+                const { prog, slot, day, elapsed, remaining, pct } = state;
+                document.getElementById('hero-context').textContent = `Ahora en pantalla · ${DAYS[day]}`;
+                document.getElementById('hero-title').textContent = fullName(prog);
+                document.getElementById('hero-subtitle').textContent = prog.sub;
+                document.getElementById('hero-time').textContent = `${slot.start} a ${slot.end} hs`;
+
+                if (prog.live) {
+                    badge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-600 text-white shadow-sm';
+                    badgeText.textContent = 'EN VIVO';
+                } else if (slot.night) {
+                    badge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-600 text-white shadow-sm';
+                    badgeText.textContent = 'FRANJA NOCTURNA';
+                } else {
+                    badge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-sm';
+                    badgeText.textContent = 'EN EMISIÓN';
+                }
+
+                cra.classList.toggle('hidden', !prog.cra);
+                cra.classList.toggle('inline-flex', !!prog.cra);
+
+                progWrap.classList.remove('hidden');
+                document.getElementById('hero-progress-bar').style.width = `${pct.toFixed(1)}%`;
+                document.getElementById('hero-elapsed').textContent = `Transcurrido: ${Math.floor(elapsed / 60) > 0 ? Math.floor(elapsed / 60) + 'h ' : ''}${elapsed % 60}m`;
+                document.getElementById('hero-remaining').textContent = `Restan: ${Math.floor(remaining / 60) > 0 ? Math.floor(remaining / 60) + 'h ' : ''}${remaining % 60}m`;
+            } else {
+                badge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white/15 text-white';
+                badgeText.textContent = 'FIN DE SEMANA';
+                document.getElementById('hero-time').textContent = 'Grilla Lunes a Viernes';
+                document.getElementById('hero-context').textContent = `Transmisión especial · ${DAYS[now.getDay()]}`;
+                document.getElementById('hero-title').textContent = 'Edición Especial de Fin de Semana';
+                document.getElementById('hero-subtitle').textContent = 'Ciclos especiales y lo mejor de la semana agroindustrial en Chacra TV.';
+                cra.classList.add('hidden');
+                progWrap.classList.add('hidden');
+            }
+
+            if (state.next) {
+                document.getElementById('next-day').textContent = state.next.dayLabel;
+                document.getElementById('next-time').textContent = state.next.time;
+                document.getElementById('next-title').textContent = fullName(state.next.prog);
+                document.getElementById('next-subtitle').textContent = state.next.prog.sub;
+                document.getElementById('next-countdown').textContent = state.next.countdown;
+            }
+
+            const activeSlotId = state.onAir ? state.slot.id : null;
+            const activeDay = state.onAir ? state.day : null;
+            const renderKey = `${activeSlotId}-${activeDay}-${activeCategory}-${searchQuery}`;
+
+            if (renderKey !== lastRenderedKey) {
+                lastRenderedKey = renderKey;
+                renderScheduleList(activeSlotId, activeDay);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            tick();
+            setInterval(tick, 1000);
+
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeCategory = btn.dataset.cat;
+                    document.querySelectorAll('.cat-btn').forEach(b => {
+                        b.className = 'cat-btn px-3.5 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer whitespace-nowrap';
+                    });
+                    btn.className = 'cat-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-chacra-900 text-white shadow-sm cursor-pointer whitespace-nowrap';
+                    tick();
+                });
+            });
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                tick();
+            });
+        });
+    </script>
+</body>
+</html>
